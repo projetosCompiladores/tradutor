@@ -1,6 +1,5 @@
 package com.ufma;
 
-import java.io.File;
 import java.io.IOException;
 
 public class Main {
@@ -20,8 +19,10 @@ public class Main {
 
                 if (commandType.equals("C_ARITHMETIC")) {
                     codeWriter.writeArithmetic(parser.arg1());
-                } else if (commandType.equals("C_PUSH") || commandType.equals("C_POP")) {
-                    codeWriter.writePushPop(commandType, parser.arg1(), parser.arg2());
+                } else if (commandType.equals("C_PUSH")) {
+                    codeWriter.writePush(parser.arg1(), parser.arg2());
+                } else if (commandType.equals("C_POP")) {
+                    codeWriter.writePop(parser.arg1(), parser.arg2());
                 }
             }
         } catch (IOException e) {
@@ -29,4 +30,3 @@ public class Main {
         }
     }
 }
-
