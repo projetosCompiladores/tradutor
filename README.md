@@ -1,5 +1,4 @@
 # VM translator
 
 Alunos:
-Filipe das Chagas Pinheiro
-Fernando Castro Sousa
+Filipe das Chagas Pinheiro e Fernando Castro Sousa
