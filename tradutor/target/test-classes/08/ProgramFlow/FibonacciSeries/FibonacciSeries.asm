@@ -1,57 +1,203 @@
-// FibonacciSeries.asm
-// Computes the Fibonacci series and stores the result in RAM.
-
-@401
-D=M         // D = argument[1] (starting address)
-@3
-M=D         // THAT = argument[1]
-
-@0
-D=A
-@3
-A=M
-M=D         // that[0] = 0
-
+@ARG // push argument 1
+D=M
 @1
-D=A
-@3
-A=M+1
-M=D         // that[1] = 1
-
-@400
-D=M         // D = argument[0]
-@2
-D=D-A       // D = argument[0] - 2
-@400
-M=D         // argument[0] -= 2
-
-(LOOP_START)
-@400
-D=M         // D = num_of_elements
-@COMPUTE_ELEMENT
-D;JGT       // If num_of_elements > 0, goto COMPUTE_ELEMENT
-@END_PROGRAM
-0;JMP       // Otherwise, goto END_PROGRAM
-
-(COMPUTE_ELEMENT)
-@3
+A=D+A
+D=M
+@SP
 A=M
-D=M         // D = that[0]
-A=A+1
-D=D+M      // D = that[0] + that[1]
-A=A+1
-M=D         // that[2] = that[0] + that[1]
-
-@3
-D=M+1       // that += 1
 M=D
-
-@400
-M=M-1       // num_of_elements--
-
-@LOOP_START
-0;JMP
-
-(END_PROGRAM)
-@END_PROGRAM
-0;JMP       // Ensures the program halts
+@SP
+M=M+1
+@SP // pop pointer 1
+M=M-1
+A=M
+D=M
+@R4
+M=D
+@0 // push constant 0
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THAT // pop that 0
+D=M
+@0
+D=D+A
+@R13
+M=D
+@SP
+M=M-1
+A=M
+D=M
+@R13
+A=M
+M=D
+@1 // push constant 1
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THAT // pop that 1
+D=M
+@1
+D=D+A
+@R13
+M=D
+@SP
+M=M-1
+A=M
+D=M
+@R13
+A=M
+M=D
+@ARG // push argument 0
+D=M
+@0
+A=D+A
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@2 // push constant 2
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP // sub
+M=M-1
+A=M
+D=M
+A=A-1
+M=M-D
+@ARG // pop argument 0
+D=M
+@0
+D=D+A
+@R13
+M=D
+@SP
+M=M-1
+A=M
+D=M
+@R13
+A=M
+M=D
+@ARG // push argument 0
+D=M
+@0
+A=D+A
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THAT // push that 0
+D=M
+@0
+A=D+A
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THAT // push that 1
+D=M
+@1
+A=D+A
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP // add
+M=M-1
+A=M
+D=M
+A=A-1
+M=D+M
+@THAT // pop that 2
+D=M
+@2
+D=D+A
+@R13
+M=D
+@SP
+M=M-1
+A=M
+D=M
+@R13
+A=M
+M=D
+@R4 // push pointer 1
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@1 // push constant 1
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP // add
+M=M-1
+A=M
+D=M
+A=A-1
+M=D+M
+@SP // pop pointer 1
+M=M-1
+A=M
+D=M
+@R4
+M=D
+@ARG // push argument 0
+D=M
+@0
+A=D+A
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@1 // push constant 1
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP // sub
+M=M-1
+A=M
+D=M
+A=A-1
+M=M-D
+@ARG // pop argument 0
+D=M
+@0
+D=D+A
+@R13
+M=D
+@SP
+M=M-1
+A=M
+D=M
+@R13
+A=M
+M=D
