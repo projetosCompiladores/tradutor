@@ -68,7 +68,7 @@ public class Parser implements AutoCloseable {
               commandType().equals("C_FUNCTION") || commandType().equals("C_CALL"))) {
             throw new IllegalStateException("arg2() called on invalid command type");
         }
-        return Integer.parseInt(currentCommand.split(" ")[2]);
+        return Integer.parseInt(currentCommand.split(" ")[2].trim());
     }
 
     @Override

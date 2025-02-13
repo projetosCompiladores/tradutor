@@ -1,18 +1,15 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "java",
-            "name": "Main",
-            "request": "launch",
-            "mainClass": "com.ufma.Main",
-            "projectName": "tradutor",
-            "args": [
-                "C:\\Users\\Filipe Pinheiro\\Documents\\GitHub\\tradutor\\tradutor\\src\\test\\java\\BasicTest.vm"
-            ]
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "com.ufma.Main",
+      "projectName": "tradutor",
+      "args": [
+        "C:\\Users\\Ferna\\Downloads\\FilipePinheiro_FernandoCastro_Tradutor_1\\tradutor\\tradutor\\src\\test\\java\\08\\ProgramFlow\\BasicLoop\\BasicLoop.vm"
+      ]
+    }
+  ]
 }
