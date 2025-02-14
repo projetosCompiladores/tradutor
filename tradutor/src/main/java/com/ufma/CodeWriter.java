@@ -8,10 +8,12 @@ public class CodeWriter implements AutoCloseable {
     private BufferedWriter writer;
     private String moduleName;
     private int synCount;
+    private int returnCounter;
 
     public CodeWriter(String fileName) throws IOException {
         writer = new BufferedWriter(new FileWriter(fileName));
         synCount = 0;
+        returnCounter = 0;
     }
 
     public void setFileName(String fileName) {
@@ -37,59 +39,35 @@ public class CodeWriter implements AutoCloseable {
         }
     }
 
-    public void writePush(String segment, int index) throws IOException {
-        if ("constant".equals(segment)) {
-            write("@" + index + " // push " + segment + " " + index);
-            write("D=A");
-            write("@SP");
-            write("A=M");
-            write("M=D");
-            write("@SP");
-            write("M=M+1");
-        } else if ("static".equals(segment) || "temp".equals(segment) || "pointer".equals(segment)) {
-            write("@" + registerName(segment, index) + " // push " + segment + " " + index);
-            write("D=M");
-            write("@SP");
-            write("A=M");
-            write("M=D");
-            write("@SP");
-            write("M=M+1");
-        } else {
-            write("@" + registerName(segment, 0) + " // push " + segment + " " + index);
-            write("D=M");
-            write("@" + index);
-            write("A=D+A");
-            write("D=M");
-            write("@SP");
-            write("A=M");
-            write("M=D");
-            write("@SP");
-            write("M=M+1");
-        }
+    public void writeInit() throws IOException {
+        write("@256");
+        write("D=A");
+        write("@SP");
+        write("M=D");
+        writeCall("Sys.init", 0);
     }
 
-    public void writePop(String segment, int index) throws IOException {
-        if ("static".equals(segment) || "temp".equals(segment) || "pointer".equals(segment)) {
-            write("@SP // pop " + segment + " " + index);
-            write("M=M-1");
-            write("A=M");
-            write("D=M");
-            write("@" + registerName(segment, index));
-            write("M=D");
-        } else {
-            write("@" + registerName(segment, 0) + " // pop " + segment + " " + index);
-            write("D=M");
-            write("@" + index);
-            write("D=D+A");
-            write("@R13");
-            write("M=D");
-            write("@SP");
-            write("M=M-1");
-            write("A=M");
-            write("D=M");
-            write("@R13");
-            write("A=M");
-            write("M=D");
+    public void writeLabel(String label) throws IOException {
+        write("(" + label + ")");
+    }
+
+    public void writeGoto(String label) throws IOException {
+        write("@" + label);
+        write("0;JMP");
+    }
+
+    public void writeIf(String label) throws IOException {
+        write("@SP");
+        write("AM=M-1");
+        write("D=M");
+        write("@" + label);
+        write("D;JNE");
+    }
+
+    public void writeFunction(String functionName, int numLocals) throws IOException {
+        write("(" + functionName + ")");
+        for (int i = 0; i < numLocals; i++) {
+            writePush("constant", 0);
         }
     }
 
@@ -241,12 +219,144 @@ public class CodeWriter implements AutoCloseable {
         write("M=M+1");
     }
 
-    @Override
-    public void close() throws IOException {
-        writer.close();
+    public void writePush(String segment, int index) throws IOException {
+        if ("constant".equals(segment)) {
+            write("@" + index + " // push " + segment + " " + index);
+            write("D=A");
+            write("@SP");
+            write("A=M");
+            write("M=D");
+            write("@SP");
+            write("M=M+1");
+        } else if ("static".equals(segment) || "temp".equals(segment) || "pointer".equals(segment)) {
+            write("@" + registerName(segment, index) + " // push " + segment + " " + index);
+            write("D=M");
+            write("@SP");
+            write("A=M");
+            write("M=D");
+            write("@SP");
+            write("M=M+1");
+        } else {
+            write("@" + registerName(segment, 0) + " // push " + segment + " " + index);
+            write("D=M");
+            write("@" + index);
+            write("A=D+A");
+            write("D=M");
+            write("@SP");
+            write("A=M");
+            write("M=D");
+            write("@SP");
+            write("M=M+1");
+        }
+    }
+
+    public void writePop(String segment, int index) throws IOException {
+        if ("static".equals(segment) || "temp".equals(segment) || "pointer".equals(segment)) {
+            write("@SP // pop " + segment + " " + index);
+            write("M=M-1");
+            write("A=M");
+            write("D=M");
+            write("@" + registerName(segment, index));
+            write("M=D");
+        } else {
+            write("@" + registerName(segment, 0) + " // pop " + segment + " " + index);
+            write("D=M");
+            write("@" + index);
+            write("D=D+A");
+            write("@R13");
+            write("M=D");
+            write("@SP");
+            write("M=M-1");
+            write("A=M");
+            write("D=M");
+            write("@R13");
+            write("A=M");
+            write("M=D");
+        }
+    }
+
+    public void writeCall(String functionName, int numArgs) throws IOException {
+        String returnLabel = "RETURN_LABEL" + returnCounter++;
+        write("@" + returnLabel);
+        write("D=A");
+        writePushD();
+        writePushSegment("LCL");
+        writePushSegment("ARG");
+        writePushSegment("THIS");
+        writePushSegment("THAT");
+        write("@SP");
+        write("D=M");
+        write("@" + (5 + numArgs));
+        write("D=D-A");
+        write("@ARG");
+        write("M=D");
+        write("@SP");
+        write("D=M");
+        write("@LCL");
+        write("M=D");
+        writeGoto(functionName);
+        write("(" + returnLabel + ")");
+    }
+
+    public void writeReturn() throws IOException {
+        write("@LCL");
+        write("D=M");
+        write("@R13");
+        write("M=D");
+        write("@5");
+        write("A=D-A");
+        write("D=M");
+        write("@R14");
+        write("M=D");
+        write("@SP");
+        write("AM=M-1");
+        write("D=M");
+        write("@ARG");
+        write("A=M");
+        write("M=D");
+        write("@ARG");
+        write("D=M+1");
+        write("@SP");
+        write("M=D");
+        writeRestoreSegment("THAT", 1);
+        writeRestoreSegment("THIS", 2);
+        writeRestoreSegment("ARG", 3);
+        writeRestoreSegment("LCL", 4);
+        write("@R14");
+        write("A=M");
+        write("0;JMP");
+    }
+
+    private void writePushD() throws IOException {
+        write("@SP");
+        write("A=M");
+        write("M=D");
+        write("@SP");
+        write("M=M+1");
+    }
+
+    private void writePushSegment(String segment) throws IOException {
+        write("@" + segment);
+        write("D=M");
+        writePushD();
+    }
+
+    private void writeRestoreSegment(String segment, int offset) throws IOException {
+        write("@R13");
+        write("D=M");
+        write("@" + offset);
+        write("A=D-A");
+        write("D=M");
+        write("@" + segment);
+        write("M=D");
     }
 
     private void write(String s) throws IOException {
         writer.write(s + "\n");
+    }
+
+    @Override
+    public void close() throws IOException {
+        writer.close();
     }
 }

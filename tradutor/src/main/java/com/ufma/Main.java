@@ -13,16 +13,40 @@ public class Main {
         String outputFileName = inputFileName.replace(".vm", ".asm");
 
         try (Parser parser = new Parser(inputFileName); CodeWriter codeWriter = new CodeWriter(outputFileName)) {
+            codeWriter.writeInit(); // Inicializa o código
+            
             while (parser.hasMoreCommands()) {
                 parser.advance();
                 String commandType = parser.commandType();
 
-                if (commandType.equals("C_ARITHMETIC")) {
-                    codeWriter.writeArithmetic(parser.arg1());
-                } else if (commandType.equals("C_PUSH")) {
-                    codeWriter.writePush(parser.arg1(), parser.arg2());
-                } else if (commandType.equals("C_POP")) {
-                    codeWriter.writePop(parser.arg1(), parser.arg2());
+                switch (commandType) {
+                    case "C_ARITHMETIC":
+                        codeWriter.writeArithmetic(parser.arg1());
+                        break;
+                    case "C_PUSH":
+                        codeWriter.writePush(parser.arg1(), parser.arg2());
+                        break;
+                    case "C_POP":
+                        codeWriter.writePop(parser.arg1(), parser.arg2());
+                        break;
+                    case "C_LABEL":
+                        codeWriter.writeLabel(parser.arg1());
+                        break;
+                    case "C_GOTO":
+                        codeWriter.writeGoto(parser.arg1());
+                        break;
+                    case "C_IF":
+                        codeWriter.writeIf(parser.arg1());
+                        break;
+                    case "C_FUNCTION":
+                        codeWriter.writeFunction(parser.arg1(), parser.arg2());
+                        break;
+                    case "C_CALL":
+                        codeWriter.writeCall(parser.arg1(), parser.arg2());
+                        break;
+                    case "C_RETURN":
+                        codeWriter.writeReturn();
+                        break;
                 }
             }
         } catch (IOException e) {
